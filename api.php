@@ -67,6 +67,37 @@ function sendKeyboard($id_chat, $text, $mark = '', $id_message = '', $keyboard =
 		return json_decode($a, true);
 	}
 
+function sendInlineKeyboard($id_chat, $text, $mark = '', $id_message = '', $keyboard = array())
+	{
+		
+		$toSend = array('method' => 'sendMessage', 'chat_id' => $id_chat, 'text' => $text, 'reply_markup' => array('inline_keyboard' => $keyboard));
+		
+		isset($mark) ? $toSend['parse_mode'] = $mark : '';
+		isset($id_message) ? $toSend['reply_to_message_id'] = $id_message : '';
+		
+		$ch = curl_init(API_URL);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+		curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($toSend));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+		$a = curl_exec($ch);
+		return json_decode($a, true);
+		
+		/*
+		// Each button is an array
+		// Array of buttons is a string
+		// Array of strings is keyboard
+		// Example:
+		// $keyboard = array(
+				array(array('text' => 'Button1', 'url' => 'url1'), array('text' => 'Button2', 'url' => 'url2')),
+				array(array('text' => 'Button3', 'url' => 'url3'), array('text' => 'Button4', 'url' => 'url4'))
+				);
+		// This will create 4 buttons, 2 in a row
+		*/
+		
+	}
+
 function deleteKeyboard($id_chat, $id_message)
 	{
 		$toSend = array('method' => 'sendMessage', 'chat_id' => $id_chat);
