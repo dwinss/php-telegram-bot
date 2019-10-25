@@ -78,7 +78,7 @@ if(preg_match('#^([+-]?(?:[0-9]*[.])?[0-9]+) ([a-zA-Z]{2,10})$#iu', $_MESS['text
 			}
 	}
 
-if(preg_match('#^/list#iu', $_TEXT))
+if(preg_match('#^/crypto_list#iu', $_TEXT))
 	{
 		$keyboard = [];
 		$tmparr = [];
@@ -98,5 +98,15 @@ if(preg_match('#^/list#iu', $_TEXT))
 						$tmparr = [];
 					}
 			}
-		sendKeyboard($_CHAT['id'], 'Выберите', 'Markdown', $_MESS['message_id'], $keyboard);
+		sendKeyboard($_CHAT['id'], 'Выберите интересующую валюту:', 'Markdown', $_MESS['message_id'], $keyboard);
+	}
+
+if(preg_match('#^/crypto#iu', $_TEXT))
+	{
+		$mess = '/crypto_list - <b>вызвать клавиатуру со списком криптовалюты</b>'.PHP_EOL;
+		$mess .= 'Бот попытается высчитать сумму валюты, если она будет указана в сообщении'.PHP_EOL;
+		$mess .= 'Например, <code>0.1 BTC</code>, <code>2.5 eth</code>'.PHP_EOL.PHP_EOL;
+		$mess .= 'Курс берется с https://coinmarketcap.com';
+		
+		sendMessage($_CHAT['id'], $mess, 'HTML', $_MESS['message_id']);
 	}

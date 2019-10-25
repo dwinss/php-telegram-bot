@@ -30,3 +30,8 @@ if(isset($_MESS['location']))
 		
 		sendMessage($_CHAT['id'], $resultweather, 'Markdown');
 	}
+
+if(preg_match('#^/weather#iu', $_TEXT))
+	{
+		sendMessage($_CHAT['id'], 'Отправьте местоположение в чат, чтобы получить краткую сводку о погоде', '', $_MESS['message_id']);
+	}
