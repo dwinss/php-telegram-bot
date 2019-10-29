@@ -11,4 +11,5 @@ np - LastFM NowPlaying
 weather - Погода
 whoami - ID пользователя и чата
 testbot - Проверка работоспособности
+admin - Список команд для администратора
 authors - О боте
