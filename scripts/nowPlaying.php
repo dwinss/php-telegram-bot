@@ -45,7 +45,7 @@ if(preg_match("#^/np ([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb) || $_TEXT == 'np'
 						$mess = $np.': <b>'.$array['recenttracks']['track'][0]['artist']['#text'].'</b> - <a href="'.$array['recenttracks']['track'][0]['url'].'">'.$array['recenttracks']['track'][0]['name'].'</a>';
 						
 						$mess .= PHP_EOL;
-						$mess .= '<code>/last username</code> - последние 10 треков'.PHP_EOL;
+						$mess .= '/last_'.$user.' - последние 10 треков'.PHP_EOL;
 					}
 						
 				
@@ -175,7 +175,7 @@ if(preg_match("#^/np ([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb) || $_TEXT == 'np'
 		
 	}
 
-if(preg_match("#^/last ([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb))
+if(preg_match("#^/last_([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb) OR preg_match("#^/last_([a-zA-Z0-9\-\_]{5,})@ADARefactorBot$#iu", $_TEXT, $cbb))
 	{
 		$user = $cbb[1];
 		
