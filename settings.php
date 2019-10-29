@@ -9,6 +9,7 @@ define('R', '/var/html/host/bot'); // рутовая директория, т.е
 # доп. сервисы
 define('SPEECHKIT_TOKEN', '123'); // token Yandex.SpeechKit для распознавания голоса
 define('LASTFM', '1234567890'); // API key Last.FM для просмотра NowPlaying
+define('WEATHER_TOKEN', '123123123'); // token для погоды
 
 # настройки подключения к БД
 @mysql_connect(':/var/run/mysqld/mysqld.sock','root','DBPASS') or die(mysql_error()); // укажите тут данные для коннекта к серверу БД
