@@ -4,10 +4,9 @@ if(isset($_MESS['location']))
 	{
 		$lat = $_MESS['location']['latitude'];
 		$lon = $_MESS['location']['longitude'];
-		$appid = 'f15182ef9cb64768a8e3c14de3e61ffe';
 		
 		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, "http://api.openweathermap.org/data/2.5/weather?lat=".$lat."&lon=".$lon."&appid=".$appid."&units=metric&lang=ru");
+		curl_setopt($ch, CURLOPT_URL, "http://api.openweathermap.org/data/2.5/weather?lat=".$lat."&lon=".$lon."&appid=".WEATHER_TOKEN."&units=metric&lang=ru");
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 		curl_setopt($ch, CURLOPT_HEADER, FALSE);
 
@@ -28,7 +27,7 @@ if(isset($_MESS['location']))
 
 		$resultweather = "[".$name."]\nПогода: *".$description."*\nТемпература: *".round($temp)."*ᵒC\nВлажность: *".$humidity."*%\nВетер: *".$speed."*м/с";
 		
-		sendMessage($_CHAT['id'], $resultweather, 'Markdown');
+		sendMessage($_CHAT['id'], $resultweather, 'Markdown', $_MESS['message_id']);
 	}
 
 if(preg_match('#^/weather#iu', $_TEXT))
