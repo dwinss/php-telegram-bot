@@ -2,9 +2,9 @@
 
 # now playing
 
-if(preg_match("#^/np ([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb) || $_TEXT == 'np' || mb_substr($_TEXT, 0, 3, 'utf-8') == '/np')
+if(preg_match("#^/np ([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb) | $_TEXT == 'np' | $_TEXT == '/np')
 	{
-		if($_TEXT == 'np' || mb_substr($_TEXT, 0, 3, 'utf-8') == '/np')
+		if($_TEXT == 'np' | $_TEXT == '/np')
 			{
 				$q = mysql_query("SELECT * FROM `lastfm_users` WHERE `id_user` = ".$_USER['id']);
 				if(mysql_num_rows($q) == 1)
@@ -42,140 +42,157 @@ if(preg_match("#^/np ([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb) || $_TEXT == 'np'
 							{
 								$np = 'Last played';
 							}
-						$mess = $np.': <b>'.$array['recenttracks']['track'][0]['artist']['#text'].'</b> - <a href="'.$array['recenttracks']['track'][0]['url'].'">'.$array['recenttracks']['track'][0]['name'].'</a>';
 						
-						$mess .= PHP_EOL;
-						$mess .= '<code>/last username</code> - последние 10 треков'.PHP_EOL;
+						if(empty($array['recenttracks']['track'][0]['artist']['#text']) && empty($array['recenttracks']['track'][0]['name']))
+							{
+								$mess = 'Нет записей о прослушанных треках';
+								$error = true;
+							}
+						else
+							{
+								$mess = $np.': <b>'.$array['recenttracks']['track'][0]['artist']['#text'].'</b> - <a href="'.$array['recenttracks']['track'][0]['url'].'">'.$array['recenttracks']['track'][0]['name'].'</a>';
+								$mess .= PHP_EOL;
+								$mess .= '/last_'.$user.' - последние 10 треков'.PHP_EOL;
+								$error = false;
+							}
 					}
 						
 				
 				
 				// Грузим страницу на LastFm и ищем линки 
 				
-				$ch = curl_init($array['recenttracks']['track'][0]['url']);
-				
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				curl_setopt($ch, CURLOPT_REFERER, 'https://lastfm.ru/');
-				curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla2/2.8');
-				
-				$a = curl_exec($ch);
-				
-				// Ищем линки на сервисы, жиесть
-				
-				$dynamicPart = '(?:[а-яА-Яa-zA-Z0-9\?\.\-\_\/\=\%\;\&\#\|\+\~\[\]\:]{3,200})';
-				$patterns = array(
-					'appleMusic' => array('(https\://(itunes|geo\.itunes|music)\.apple\.com/'.$dynamicPart.')', 'Apple Music'),
-					'spotify' =>  array('(https\://open\.spotify\.com/'.$dynamicPart.')', 'Spotify'),
-					'youtube' =>  array('(https\://(?:www\.)?youtube\.com/'.$dynamicPart.')', 'YouTube'),
-					'pandora' =>  array('(https\://(?:www\.)?pandora\.com/'.$dynamicPart.')', 'Pandora'),
-					'google' =>  array('(https\://play\.google\.com/music/'.$dynamicPart.')', 'Google Music'),
-					'deezer' =>  array('(https\://(?:www\.)?deezer\.com/'.$dynamicPart.')', 'Deezer'),
-					'amazonMusic' =>  array('(https\://music\.amazon\.com/'.$dynamicPart.')', 'Amazon'),
-					'tidal' =>  array('(https\://listen\.tidal\.com/'.$dynamicPart.')', 'Tidal'),
-					'napster' =>  array('(http\://napster\.com/'.$dynamicPart.')', 'Napster'),
-					'yandex' =>  array('(https\://music\.yandex\.ru/'.$dynamicPart.')', 'Yandex Music'),
-					'soundcloud' => array('(https\://soundcloud\.com/'.$dynamicPart.')', 'SoundCloud')
-					
-					);
-				
-				foreach($patterns as $service => $pattern)
+				if(!$error)
 					{
-						if(preg_match('#'.$pattern[0].'#iu', $a, $res))
-							{
-								$_FOUND = true;
-								$sourceLink = trim($res[1]);
-								
-								$url = 'https://api.song.link/v1-alpha.1/links?url='.urlencode($sourceLink);
+				
+						$ch = curl_init($array['recenttracks']['track'][0]['url']);
 						
-								$ch = curl_init($url);
-
-								curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-								curl_setopt($ch, CURLOPT_REFERER, 'https://github.com/songlink/docs/blob/master/api-v1-alpha.1.md');
-
-								$a = curl_exec($ch);
-								
-								$data = @json_decode($a, true);
-								
-								
-								if($data === false)
+						curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+						curl_setopt($ch, CURLOPT_REFERER, 'https://lastfm.ru/');
+						curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla2/2.8');
+						
+						$a = curl_exec($ch);
+						
+						// Ищем линки на сервисы, жиесть
+						
+						$dynamicPart = '(?:[а-яА-Яa-zA-Z0-9\?\.\-\_\/\=\%\;\&\#\|\+\~\[\]\:]{3,200})';
+						$patterns = array(
+							'appleMusic' => array('(https\://(itunes|geo\.itunes|music)\.apple\.com/'.$dynamicPart.')', 'Apple Music'),
+							'spotify' =>  array('(https\://open\.spotify\.com/'.$dynamicPart.')', 'Spotify'),
+							'youtube' =>  array('(https\://(?:www\.)?youtube\.com/'.$dynamicPart.')', 'YouTube'),
+							'pandora' =>  array('(https\://(?:www\.)?pandora\.com/'.$dynamicPart.')', 'Pandora'),
+							'google' =>  array('(https\://play\.google\.com/music/'.$dynamicPart.')', 'Google Music'),
+							'deezer' =>  array('(https\://(?:www\.)?deezer\.com/'.$dynamicPart.')', 'Deezer'),
+							'amazonMusic' =>  array('(https\://music\.amazon\.com/'.$dynamicPart.')', 'Amazon'),
+							'tidal' =>  array('(https\://listen\.tidal\.com/'.$dynamicPart.')', 'Tidal'),
+							'napster' =>  array('(http\://napster\.com/'.$dynamicPart.')', 'Napster'),
+							'yandex' =>  array('(https\://music\.yandex\.ru/'.$dynamicPart.')', 'Yandex Music'),
+							'soundcloud' => array('(https\://soundcloud\.com/'.$dynamicPart.')', 'SoundCloud')
+							
+							);
+						
+						foreach($patterns as $service => $pattern)
+							{
+								if(preg_match('#'.$pattern[0].'#iu', $a, $res))
 									{
-										sendMessage($_CHAT['id'], 'API error');
-									}
-								else
-									{
-										if(!empty($data['linksByPlatform']))
+										$_FOUND = true;
+										$sourceLink = trim($res[1]);
+										
+										$url = 'https://api.song.link/v1-alpha.1/links?url='.urlencode($sourceLink);
+								
+										$ch = curl_init($url);
+
+										curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+										curl_setopt($ch, CURLOPT_REFERER, 'https://github.com/songlink/docs/blob/master/api-v1-alpha.1.md');
+
+										$a = curl_exec($ch);
+										
+										$data = @json_decode($a, true);
+										
+										
+										if($data === false)
 											{
-												// Соберем линки на сервисы в отдельный массив - это удобнее
-												foreach($data['linksByPlatform'] as $key => $value)
-													{
-														// включаем в массив только те сервисы, которые нас интересуют
-														if(isset($patterns[$key]))
-															{
-																$links[$key] = $value['url'];
-															}
-													}
-												
-												// Необходимо выяснить название трека и исполнителя
-												
-												foreach($data['entitiesByUniqueId'] as $key => $value)
-													{
-														// Мы достигли первого элемента, больше нам и не надо
-														$song['artist'] = isset($value['artistName']) ? $value['artistName'] : 'Unknown Artist';
-														$song['title'] = isset($value['title']) ? $value['title'] : 'Unknown Track';
-														break;
-													}
-												
-												// Начинаем формировать сообщение
-												// $message = 'Трек <b>'.$song['artist'].'</b> - <b>'.$song['title'].'</b> на стриминговых платформах:';
-												
-												$keyboard = [];
-												$tmparr = [];
-												$buttonsCounter = 0;
-												
-												$c_links = count($links);
-												foreach($links as $service => $link)
-													{
-														$buttonsCounter++;
-														$tmparr[] = array('text' => $patterns[$service][1], 'url' => $link);
-														$needToSend = true;
-														
-														if($buttonsCounter % 3 == 0 OR $buttonsCounter == $c_links)
-															{
-																$keyboard[] = $tmparr;
-																unset($tmparr);
-															}
-													}
-												
-												# проверяем, нашли ли ваще чего то кроме исходного сервиса
-												if(@$needToSend)
-													{
-														//$txt = implode("\r\n", $links);
-														
-														//sendMessage($_CHAT['id'], $txt, 'HTML', $_MESS['message_id']);
-														
-														sendInlineKeyboard($_CHAT['id'], $mess, 'HTML', $_MESS['message_id'], $keyboard);
-													}
+												sendMessage($_CHAT['id'], 'API error');
 											}
 										else
 											{
-												sendMessage($_CHAT['id'], $mess, 'HTML', $_MESS['message_id']);
+												if(!empty($data['linksByPlatform']))
+													{
+														// Соберем линки на сервисы в отдельный массив - это удобнее
+														foreach($data['linksByPlatform'] as $key => $value)
+															{
+																// включаем в массив только те сервисы, которые нас интересуют
+																if(isset($patterns[$key]))
+																	{
+																		$links[$key] = $value['url'];
+																	}
+															}
+														
+														// Необходимо выяснить название трека и исполнителя
+														
+														foreach($data['entitiesByUniqueId'] as $key => $value)
+															{
+																// Мы достигли первого элемента, больше нам и не надо
+																$song['artist'] = isset($value['artistName']) ? $value['artistName'] : 'Unknown Artist';
+																$song['title'] = isset($value['title']) ? $value['title'] : 'Unknown Track';
+																break;
+															}
+														
+														// Начинаем формировать сообщение
+														// $message = 'Трек <b>'.$song['artist'].'</b> - <b>'.$song['title'].'</b> на стриминговых платформах:';
+														
+														$keyboard = [];
+														$tmparr = [];
+														$buttonsCounter = 0;
+														
+														$c_links = count($links);
+														foreach($links as $service => $link)
+															{
+																$buttonsCounter++;
+																$tmparr[] = array('text' => $patterns[$service][1], 'url' => $link);
+																$needToSend = true;
+																
+																if($buttonsCounter % 3 == 0 OR $buttonsCounter == $c_links)
+																	{
+																		$keyboard[] = $tmparr;
+																		unset($tmparr);
+																	}
+															}
+														
+														# проверяем, нашли ли ваще чего то кроме исходного сервиса
+														if(@$needToSend)
+															{
+																//$txt = implode("\r\n", $links);
+																
+																//sendMessage($_CHAT['id'], $txt, 'HTML', $_MESS['message_id']);
+																
+																sendInlineKeyboard($_CHAT['id'], $mess, 'HTML', $_MESS['message_id'], $keyboard);
+															}
+													}
+												else
+													{
+														sendMessage($_CHAT['id'], $mess, 'HTML', $_MESS['message_id']);
+													}
+												
 											}
-										
+											
+										break;
 									}
-									
-								break;
+							}
+						
+						if(@$_FOUND != true)
+							{
+								sendMessage($_CHAT['id'], $mess, 'HTML', $_MESS['message_id']);
 							}
 					}
-				
-				if(@$_FOUND != true)
+				else
 					{
-						sendMessage($_CHAT['id'], $mess, 'HTML', $_MESS['message_id']);
+						sendMessage($_CHAT['id'], $mess, '', $_MESS['message_id']);
 					}
 			}
 		
 	}
 
-if(preg_match("#^/last ([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb))
+if(preg_match("#^/last_([a-zA-Z0-9\-\_]{5,})$#iu", $_TEXT, $cbb) OR preg_match("#^/last_([a-zA-Z0-9\-\_]{5,})@ADARefactorBot$#iu", $_TEXT, $cbb))
 	{
 		$user = $cbb[1];
 		

@@ -24,11 +24,6 @@ if(preg_match('#^([a-zA-Zа-яА-ЯёЁ0-9\-_\@ ]{1,}) или ([a-zA-Zа-яА-Я
 				
 				$texts = array('Разумеется', 'Думаю, что', 'Всяко', 'Глупый вопрос,', 'Очевидно же, что');
 				$send = $texts[rand(0, count($texts) - 1)].' '.$res[$r];
-				
-			if($_USER['username'] == 'GreenKovsh' && mt_rand(1, 4) == 2)
-					{
-						$send = 'Ковш, ты меня заебал уже своими ебанутыми вопросами. Отъебись, а?';
-					}
 			}
 		
 		sendMessage($_CHAT['id'], $send, '', $_MESS['message_id']);
